@@ -488,13 +488,7 @@ class EpicPay_refund {
 					'description' => __( 'This controls the description which the user sees during checkout.', 'epicpay_woocommerce' ),
 					'default'     => __( 'Pay with your credit card via EpicPay.', 'epicpay_woocommerce' )
 				),
-				/*'testmode'           => array(
-					'title'       => __( 'Notification Url', 'epicpay_woocommerce' ),
-					'label'       => __( '<b>'.get_site_url().'/wp-admin/admin-post.php?action=get_typeform_data</b>', 'epicpay_woocommerce' ),
-					'type'        => 'checkbox',
-					'description' => __( 'Please setup this Url in https://dashboard.exactly.com/ for Webhooks as Event / URI', 'epicpay_woocommerce' ),
-					'default'     => 'no'
-				),*/
+
 				'notify_URL_API'           => array(
 					'title'       => __( 'Notification Url', 'epicpay_woocommerce' ),
 					'type'        => 'text',
@@ -503,12 +497,7 @@ class EpicPay_refund {
 					'style'    => 'background:red',
 					'default'     => get_site_url().'/wp-admin/admin-post.php?action=get_typeform_data'
 				),
-				/*'paymentgatewayid'   => array(
-					'title'       => __( 'Payment Gateway ID', 'epicpay_woocommerce' ),
-					'type'        => 'text',
-					'description' => __( 'This is the Payment Gateway ID supplied by Epicpay.', 'epicpay_woocommerce' ),
-					'default'     => '16'
-				),*/
+	
 				'merchantid'         => array(
 					'title'       => __( 'Merchant ID', 'epicpay_woocommerce' ),
 					'type'        => 'text',
@@ -521,49 +510,7 @@ class EpicPay_refund {
 					'description' => __( 'This is the Secret Key supplied by EpicPayments.', 'epicpay_woocommerce' ),
 					'default'     => 'GHDjtBRDO22vgB5X9s6t3iCup2gfw9ahTbC6Sri3sT4SVTtyEbLFNFrbWW4ez2PF'
 				),
-				/*'notification_email' => array(
-					'title'       => __( 'Notification Email', 'epicpay_woocommerce' ),
-					'type'        => 'text',
-					'description' => __( 'This is the email Epicpay will send payment receipts to.', 'epicpay_woocommerce' ),
-					'default'     => get_option( 'admin_email' )
-				),*/
-				/*'langpaymentpage'    => array(
-					'title'       => __( 'Language of Payment Page', 'epicpay_woocommerce' ),
-					'type'        => 'select',
-					'description' => __('Select which language to show on Payment Page.', 'epicpay_woocommerce' ),
-					'default'     => 'en',
-					'options'     => array(
-						'is' => __('Icelandic', 'epicpay_woocommerce' ),
-						'en' => __('English', 'epicpay_woocommerce' ),
-						'de' => __('German', 'epicpay_woocommerce' ),
-						'fr' => __('French', 'epicpay_woocommerce' ),
-						'it' => __('Italian', 'epicpay_woocommerce' ),
-						'pt' => __('Portugese', 'epicpay_woocommerce' ),
-						'ru' => __('Russian', 'epicpay_woocommerce' ),
-						'es' => __('Spanish', 'epicpay_woocommerce' ),
-						'se' => __('Swedish', 'epicpay_woocommerce' ),
-						'hu' => __('Hungarian', 'epicpay_woocommerce' ),
-						'si' => __('Slovene', 'epicpay_woocommerce' )
-					)
-				),*/
-				/*'receipttext'     	=> array(
-					'title'       =>  __('Receipt text', 'epicpay_woocommerce'),
-					'type'        => 'textarea',
-					'description' =>  __('Buyer will see this text after woocommerce order create.', 'epicpay_woocommerce'),
-					'default'     =>  __('Thank you - your order is now pending payment. We are now redirecting you to EpicPayments to make payment.', 'epicpay_woocommerce'),
-				),
-				'redirecttext'     	=> array(
-					'title'       =>  __('Redirect text', 'epicpay_woocommerce'),
-					'type'        => 'textarea',
-					'description' => __('Buyer will see this text before redirecting to EpicPayments', 'epicpay_woocommerce'),
-					'default'     => __('Thank you for your order. We are now redirecting you to EpicPayments to make payment.', 'epicpay_woocommerce'),
-				),*/
-				/*'returnUrl_API'         => array(
-					'title'       =>  __('Return Page URL(base url)', 'epicpay_woocommerce' ),
-					'type'        => 'text',
-					'description' =>  __('URL to redirect customer after transaction is completed. Host must be in allow list. Please contact support to add your host.', 'epicpay_woocommerce' ),
-					'default'     => ''
-				),*/
+
 				'returnUrl_API'         => array(
 					'title'       =>  __('Return Page URL(base url)', 'epicpay_woocommerce' ),
 					'type'        => 'text',
@@ -572,25 +519,7 @@ class EpicPay_refund {
 					'disabled' => true,
 					'default'     => get_site_url()
 				),
-				/*'cancelurl'          => array(
-					'title'       =>  __('Cancel Page URL', 'epicpay_woocommerce' ),
-					'type'        => 'text',
-					'description' =>  __('Buyer will be sent to this page if he pushes the cancel button instead of finalizing the payment.', 'epicpay_woocommerce' ),
-					'default'     => ''
-				),
-				'errorurl'           => array(
-					'title'       =>  __('Error Page URL', 'epicpay_woocommerce' ),
-					'type'        => 'text',
-					'description' =>  __('Buyer will be sent to this page if an unexpected error occurs.', 'epicpay_woocommerce' ),
-					'default'     => ''
-				),
-				'TotalLineItem' => array(
-					'title'       => __('Order line items grouping', 'epicpay_woocommerce'),
-					'label'       => __('Send order as 1 line item', 'epicpay_woocommerce'),
-					'type'        => 'checkbox',
-					'description' => __('You can uncheck this if you don\'t use discounts and have integer quantities.', 'epicpay_woocommerce'),
-					'default'     => 'yes'
-				)*/
+
 			);
 		}
 		/**
