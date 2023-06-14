@@ -4,16 +4,16 @@
   Plugin URI: https://epicfrog.com/
   Description: Extends WooCommerce with a <a href="https://docs.epicfrog.com/plugins/epicpayments/" target="_blank">EpicPayments</a> gateway.
   Version: 1.0
-  Author: Epic Frog
-  Author URI: https://epicfrog.com/
+  Author: ExcellentDynamics
+  Author URI: http://excellentdynamics.biz
   Text Domain: epicpay_woocommerce
   Domain Path: /languages
   Requires at least: 4.4
   Tested up to: 6.2
   WC tested up to: 7.5.1
   WC requires at least: 3.2.3
-  License: GNU General Public License v3.0
-  License URI: https://www.gnu.org/licenses/gpl-3.0.html
+  License: GPLv2 or later
+  License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */
 
 define( 'EPICPAY_DIR', plugin_dir_path( __FILE__ ) );
@@ -480,13 +480,13 @@ class EpicPay_refund {
 					'title'       =>  __( 'Title', 'epicpay_woocommerce' ),
 					'type'        => 'text',
 					'description' =>  __( 'This controls the title which the user sees during checkout.', 'epicpay_woocommerce' ),
-					'default'     =>  __( 'EpicPay', 'epicpay_woocommerce' )
+					'default'     =>  __( '', 'epicpay_woocommerce' )
 				),
 				'description'        => array(
 					'title'       => __( 'Description', 'epicpay_woocommerce' ),
 					'type'        => 'textarea',
 					'description' => __( 'This controls the description which the user sees during checkout.', 'epicpay_woocommerce' ),
-					'default'     => __( 'Pay with your credit card via EpicPay.', 'epicpay_woocommerce' )
+					'default'     => __( '', 'epicpay_woocommerce' )
 				),
 
 				'notify_URL_API'           => array(
@@ -497,18 +497,17 @@ class EpicPay_refund {
 					'style'    => 'background:red',
 					'default'     => get_site_url().'/wp-admin/admin-post.php?action=get_typeform_data'
 				),
-	
 				'merchantid'         => array(
 					'title'       => __( 'Merchant ID', 'epicpay_woocommerce' ),
 					'type'        => 'text',
 					'description' =>  __( 'This is the ID supplied by EpicPayments.', 'epicpay_woocommerce' ),
-					'default'     => '98cda84a-24d8-4479-8606-c3a47fe80df1'
+					'default'     => ''
 				),
 				'secretkey'          => array(
 					'title'       => __( 'Api Key', 'epicpay_woocommerce' ),
 					'type'        => 'text',
 					'description' => __( 'This is the Secret Key supplied by EpicPayments.', 'epicpay_woocommerce' ),
-					'default'     => 'GHDjtBRDO22vgB5X9s6t3iCup2gfw9ahTbC6Sri3sT4SVTtyEbLFNFrbWW4ez2PF'
+					'default'     => ''
 				),
 
 				'returnUrl_API'         => array(
@@ -519,7 +518,6 @@ class EpicPay_refund {
 					'disabled' => true,
 					'default'     => get_site_url()
 				),
-
 			);
 		}
 		/**
