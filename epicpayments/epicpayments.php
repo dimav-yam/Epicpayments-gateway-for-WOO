@@ -47,7 +47,11 @@ $requirements = [
 	],
 ];
 
+
+require __DIR__ . '/libs/EpicPay.class.php';
+require __DIR__ . '/libs/EpicPay_Refund.class.php';
 require __DIR__ . '/vendor_prefixed/wpdesk/wp-plugin-flow-common/src/plugin-init-php52-free.php';
+
 function epicpay_wc_active() {
 	if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
 		return true;
@@ -72,9 +76,6 @@ function process_data_form_tyepform_webhook() {
 	}
 	
 		
-	    
-
- 
 	echo "event:" . $data["data"]["attributes"]["event"]."\n";
 	echo "type:" . $data["data"]["relationships"]["transaction"]["data"]["type"]."\n";
 	
@@ -133,11 +134,7 @@ function process_data_form_tyepform_webhook() {
 			
 			}
 		}
-		
-		
 
-		
-	
 }
 
 // define the http_request_host_is_external callback 
@@ -220,161 +217,8 @@ function woocommerce_epicpay_init() {
 		$methods[] = 'WC_Gateway_Epicpay';
 		return $methods;
 	}
-	class EpicPay {
-    private $MerchantLongId;  
-    private $token;
-    
-    private $apiGatewayUrl = 'https://api.exactly.com/api/v1/transactions';
-    function __construct($MerchantLongId, $TerminalKey) {
-       
-        $this->MerchantLongId = $MerchantLongId;        
-        $this->TerminalKey = $TerminalKey;
-    }
-    private function request($method = 'POST', $url, $json = false) {
-        $curl = curl_init();
-        $header = [
-            "Content-Type: application/vnd.api+json",
-            "cache-control: no-cache"
-        ];
-     
-            $header[] = "Authorization: Api-Key ". $this->TerminalKey;
-        
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => $method,
-            CURLOPT_POSTFIELDS => $json?json_encode($json):"",
-            CURLOPT_HTTPHEADER => $header,
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-       
-        if(!empty($this->token)){
-            $this->token = '';
-        }
-        
-        return $response;
-    }
-    private function login() {
-        $params = [
-            "projectId" => $this->MerchantLongId,
-        ];
-        $response_json = $this->request('POST', $this->apiGatewayUrl.'',$params);
-        $response = json_decode($response_json);
-    }
-    function transaction($order_id,$amount,$currency,$email, $merchantID, $return_url, $referenceID) {
-        try{
-            $this->login();
-            $gen_id = rand(5, 99999);
-            $price_show = sprintf('%02.2f', $amount);
-            $params = [
-            'data' => [
-                'attributes' =>
-                [
-                    'projectId' => $merchantID,
-                    'paymentMethod' => 'card',
-                    'currency' => $currency,
-                    'amount' => $price_show, 
-                    'referenceId'=> $referenceID,
-                    //'originalReferenceId' => $referenceID,
-                    'returnUrl'=> $return_url,
-                    'email' => $email,
-                ],
-                'type' => 'charge',
-                ],
-            ];
-            
-            $response_json = $this->request('POST', $this->apiGatewayUrl.'', $params);
-           
-            return $response_json;
-        } catch (\Exception $e) {
-            var_dump($e->getMessage());
-       }
-    }
-}
 
-class EpicPay_refund {
-    private $MerchantLongId;  
-    private $token;
-    
-    private $apiGatewayUrl = 'https://api.exactly.com/api/v1/transactions';
-    function __construct($MerchantLongId, $TerminalKey) {
-       
-        $this->MerchantLongId = $MerchantLongId;        
-        $this->TerminalKey = $TerminalKey;
-    }
-    private function request($method = 'POST', $url, $json = false) {
-        $curl = curl_init();
-        $header = [
-            "Content-Type: application/vnd.api+json",
-            "cache-control: no-cache"
-        ];
-     
-            $header[] = "Authorization: Api-Key ". $this->TerminalKey;
-        
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => $method,
-            CURLOPT_POSTFIELDS => $json?json_encode($json):"",
-            CURLOPT_HTTPHEADER => $header,
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-       
-        if(!empty($this->token)){
-            $this->token = '';
-        }
-        
-        return $response;
-    }
-    private function login() {
-        $params = [
-            "projectId" => $this->MerchantLongId,
-        ];
-        $response_json = $this->request('POST', $this->apiGatewayUrl.'',$params);
-        $response = json_decode($response_json);
-    }
-    function transaction($order_id,$amount,$currency,$email, $merchantID, $return_url, $referenceID) {
-        try{
-            $this->login();
-            $gen_id = rand(5, 99999);
-            $price_show = sprintf('%02.2f', $amount);
-            $params = [
-            'data' => [
-                'attributes' =>
-                [
-                    'projectId' => $merchantID,
-                    'paymentMethod' => 'card',
-                    'currency' => $currency,
-                    'amount' => $price_show, 
-                    //'referenceId'=> $referenceID,
-                    'originalReferenceId' => $referenceID,
-                    'returnUrl'=> $return_url,
-                    'email' => $email,
-                ],
-                'type' => 'refund',
-                ],
-            ];
-            
-            $response_json = $this->request('POST', $this->apiGatewayUrl.'', $params);
-           
-            return $response_json;
-        } catch (\Exception $e) {
-            var_dump($e->getMessage());
-       }
-    }
-}
+
 
 	/**
 	 * @property string testmode
@@ -429,45 +273,52 @@ class EpicPay_refund {
 			add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'check_epicpay_response' ) );
 			add_action( 'before_woocommerce_pay', array( $this, 'checkout_payment_handler'), 9 );
 			
-			if ( ! $this->is_valid_for_use() ) {
-				$this->enabled = false;
-			}
+			
 		}
 		
 		public function admin_options() {
 			?>
 			<h3> <?php _e( 'EpicPayments', 'epicpay_woocommerce' ); ?></h3>
 			<p> <?php _e( 'Pay with your credit card via EpicPayments.', 'epicpay_woocommerce' ); ?></p>
-			<?php if ( $this->is_valid_for_use() ) : ?>
+			
 				<table class="form-table"><?php $this->generate_settings_html(); ?></table>
-			<?php else : ?>
-				<div class="inline error"><p><strong><?php _e( 'Gateway Disabled:', 'epicpay_woocommerce' ); ?></strong><?php _e( 'Current Store currency is not valid for epicpay gateway. Must be in ISK, USD, EUR, GBP, DKK, NOK, SEK, CHF, JPY, CAD, HUF', 'epicpay_woocommerce' ); ?></p></div>
-				<?php
-			endif;
+			
+				<table class="form-table">		<tbody>
+
+		<tr valign="top">
+			<th scope="row" class="titledesc">
+				<label for="woocommerce_epicpay_title">Return Page URL(base url) </label>
+			</th>
+			<td class="forminp">
+				<fieldset>
+					<legend class="screen-reader-text"><span>Base Url</span></legend>
+					<input class="input-text regular-input " type="text" name="woocommerce_epicpay_title" id="woocommerce_epicpay_title" style="width: 100%;max-width: 800px;color: #222121;font-weight: bold;opacity: 0.7;" value="<?php echo get_site_url(); ?>" placeholder="" disabled="disabled">
+					<p class="description">URL to redirect customer after transaction is completed. Host must be in allow list. Please contact support to add your host.</p>
+				</fieldset>
+			</td>
+		</tr>
+
+		<tr valign="top">
+			<th scope="row" class="titledesc">
+				<label for="woocommerce_epicpay_title">Notification Url</label>
+			</th>
+			<td class="forminp">
+				<fieldset>
+					<legend class="screen-reader-text"><span>Notification Url</span></legend>
+					<input class="input-text regular-input " type="text" name="woocommerce_epicpay_title" id="woocommerce_epicpay_title" style="width: 100%;max-width: 800px;color: #222121;font-weight: bold;opacity: 0.7;" value="<?php echo get_site_url().'/wp-admin/admin-post.php?action=get_typeform_data'; ?>" placeholder="" disabled="disabled">
+					<p class="description">Please setup this Url in https://dashboard.exactly.com/ for Webhooks as Event / URI</p>
+				</fieldset>
+			</td>
+		</tr>
+				
+		</tbody></table>
+
+			<?php
 		}
-		//Check if this gateway is enabled and available in the user's country
-		function is_valid_for_use() {
-			if ( ! in_array( get_woocommerce_currency(), array(
-				'ISK',
-				'USD',
-				'EUR',
-				'GBP',
-				'DKK',
-				'NOK',
-				'SEK',
-				'CHF',
-				'JPY',
-				'CAD',
-				'HUF'
-			) )
-			) {
-				return false;
-			}
-			return true;
-		}
+	
 		//Initialize Gateway Settings Form Fields
 		function init_form_fields() {
-			 echo '<style>#woocommerce_epicpay_notify_URL_API, #woocommerce_epicpay_returnUrl_API { font-weight:bold;max-width: 800px;width: 100%;}</style>';
+			 
 			$this->form_fields = array(
 				'enabled'            => array(
 					'title'       => __( 'Enable/Disable', 'epicpay_woocommerce' ),
@@ -489,14 +340,14 @@ class EpicPay_refund {
 					'default'     => __( '', 'epicpay_woocommerce' )
 				),
 
-				'notify_URL_API'           => array(
+				/*'notify_URL_API'           => array(
 					'title'       => __( 'Notification Url', 'epicpay_woocommerce' ),
 					'type'        => 'text',
 					'description' => __( 'Please setup this Url in https://dashboard.exactly.com/ for Webhooks as Event / URI', 'epicpay_woocommerce' ),
 					'disabled' => true,
 					'style'    => 'background:red',
 					'default'     => get_site_url().'/wp-admin/admin-post.php?action=get_typeform_data'
-				),
+				),*/
 				'merchantid'         => array(
 					'title'       => __( 'Merchant ID', 'epicpay_woocommerce' ),
 					'type'        => 'text',
@@ -510,14 +361,6 @@ class EpicPay_refund {
 					'default'     => ''
 				),
 
-				'returnUrl_API'         => array(
-					'title'       =>  __('Return Page URL(base url)', 'epicpay_woocommerce' ),
-					'type'        => 'text',
-					'description' =>  __('URL to redirect customer after transaction is completed. Host must be in allow list. Please contact support to add your host.', 'epicpay_woocommerce' ),
-					
-					'disabled' => true,
-					'default'     => get_site_url()
-				),
 			);
 		}
 		/**
@@ -686,6 +529,7 @@ class EpicPay_refund {
 			}
 			return $epicpay_args;
 		}
+
 		//Generate the epicpay button link
 		function generate_epicpay_form( $order_id, $redirect = true ) {
 			global $woocommerce;
@@ -694,46 +538,17 @@ class EpicPay_refund {
 			} else {
 				$order = new WC_Order( $order_id );
 			}
-			/*if ( 'yes' == $this->testmode ) {
-				$epicpay_adr = self::EPICPAY_ENDPOINT_SANDBOX . 'default.aspx';
-			} else {
-				$epicpay_adr = self::EPICPAY_ENDPOINT_LIVE . 'default.aspx';
-			}
-			$epicpay_args       = $this->get_epicpay_args( $order );
-			$epicpay_args_array = array();
-			foreach ( $epicpay_args as $key => $value ) {
-				$epicpay_args_array[] = '<input type="hidden" name="' . esc_attr( $key ) . '" value="' . esc_attr( $value ) . '" />';
-			}*/
-			/*if($redirect){
-				$redirecttext = $this->get_translated_string($this->redirecttext, 'redirecttext');
-				$code = sprintf( '$.blockUI({
-						message: "%s",
-						baseZ: 99999,
-	                    overlayCSS: { background: "#fff", opacity: 0.6 },
-	                    css: {
-	                        padding:        "20px",
-	                        zindex:         "9999999",
-	                        textAlign:      "center",
-	                        color:          "#555",
-	                        border:         "3px solid #aaa",
-	                        backgroundColor:"#fff",
-	                        cursor:         "wait",
-	                        lineHeight:     "24px",
-	                    }
-	                });
-	                jQuery("#epicpay_payment_form").submit();', $redirecttext );
-				wc_enqueue_js( $code );
-			}*/
+
 			$merchantID = $this->merchantid;/*'98cda84a-24d8-4479-8606-c3a47fe80df1';*/
 			$terminalKey = $this->secretkey; /*'GHDjtBRDO22vgB5X9s6t3iCup2gfw9ahTbC6Sri3sT4SVTtyEbLFNFrbWW4ez2PF';*/
 			// environment fetch
 			$epicPay = new EpicPay($merchantID,  $terminalKey);
 			/*--*/
-			$currency = 'EUR';
+			$currency = $order->get_currency(); /*get currency*/
 			$return_url = $this->returnUrl_API;
 			$amount = $order->get_total(); // amount in euro with point x.xx or not
 			$referenceID = 'charge-'.$order->get_id();
-			$email = 'test@test.com';
+			$email = 'test@test.com'; 
 			/*--*/
 			$result = $epicPay->transaction($order_id,$amount,$currency,$email, $merchantID, $return_url, $referenceID);
 			$obj = json_decode($result);
@@ -1032,7 +847,7 @@ class EpicPay_refund {
 			$merchantID = $this->merchantid;/*'98cda84a-24d8-4479-8606-c3a47fe80df1';*/
 			$terminalKey = $this->secretkey; /*'GHDjtBRDO22vgB5X9s6t3iCup2gfw9ahTbC6Sri3sT4SVTtyEbLFNFrbWW4ez2PF';*/
 			// environment fetch
-			$epicPay_refund = new EpicPay_refund($merchantID,  $terminalKey);
+			$epicPay_refund = new EpicPay_Refund($merchantID,  $terminalKey);
 			/*--*/
 			$currency = 'EUR';
 			$return_url = $this->returnUrl_API;
@@ -1042,57 +857,6 @@ class EpicPay_refund {
 			/*--*/
 			$result = $epicPay_refund->transaction($order_id,$amount,$currency,$email, $merchantID, $return_url, $referenceID);
 			$obj = json_decode($result);
-			
-			/*if ( ! $this->can_refund_order( $order ) ) {
-				return new WP_Error( 'error', __( 'Refund failed.', 'epicpay_woocommerce' ) );
-			}*/
-			//$refundid = get_post_meta( $order_id , '_' . $this->id . '_refundid', true );
-			/*if ( 'yes' == $this->testmode ) {
-				$epicpay_adr = self::EPICPAY_ENDPOINT_SANDBOX . 'refund.aspx';
-			} else {
-				$epicpay_adr = self::EPICPAY_ENDPOINT_LIVE . 'refund.aspx';
-			}*/
-			/*$data = [];
-			$data['RefundId'] = $refundid;
-			$data['MerchantId'] = $this->merchantid;
-			$data['PaymentGatewayId'] = $this->paymentgatewayid;
-			$data['Checkhash'] = $this->check_order_refund_hash( $order );
-			$data['amount'] = $amount;*/
-			/*$response = wp_remote_post(
-				$epicpay_adr,
-				array(
-					'method'      => 'POST',
-					'timeout'     => 45,
-					'redirection' => 5,
-					'httpversion' => '1.0',
-					'headers'     => array(),
-					'body'        => $data,
-					'sslverify'   => false
-				)
-			);*/
-			/*if ( empty( $response['body'] ) ) {
-				$message = __( 'Empty Response', 'epicpay');
-				$order->add_order_note( $message );
-				return new WP_Error( 'error', $message );
-			} elseif ( is_wp_error( $response ) ) {
-				$message = $response->get_error_message();
-				$order->add_order_note( $message );
-				return new WP_Error( 'error', $message );
-			}*/
-			/*$body = wp_remote_retrieve_body( $response );
-			if( !empty($body) ) {
-				parse_str($body, $result);
-				if( isset($result['action_code']) && $result['action_code'] == '000' && isset($result['ret']) && $result['ret'] == true ) {
-					$message = sprintf( __('Refunded %s %s via Epicpay', 'epicpay_woocommerce' ), $amount, $order->get_currency() );
-					$order->add_order_note( $message );
-					return true;
-				}
-				else {
-					/*$message = sprintf( __('Epicpay error: %s, Amount: %s %s', 'epicpay_woocommerce' ), $result['message'], $amount, $order->get_currency() );
-					$order->add_order_note( $message );
-					return new WP_Error( 'error', $result['message'] );
-				}
-			}*/
 				if( 1==1) {
 					$message = sprintf( __('Refunded %s %s via EpicPayments', 'epicpay_woocommerce' ), $amount, $order->get_currency() );
 					$message2 = sprintf( __('EpicPayments error: %s, Amount: %s %s', 'epicpay_woocommerce' ), $result['message2'], $amount, $order->get_currency() );

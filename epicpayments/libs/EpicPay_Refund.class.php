@@ -1,0 +1,78 @@
+<?php
+
+/*
+ * This file is part of the EpicPay package.
+ *
+ */
+
+class EpicPay_Refund {
+    private $MerchantLongId;  
+    private $token;
+    
+    private $apiGatewayUrl = 'https://api.exactly.com/api/v1/transactions';
+    function __construct($MerchantLongId, $TerminalKey) {
+       
+        $this->MerchantLongId = $MerchantLongId;        
+        $this->TerminalKey = $TerminalKey;
+    }
+    private function request($method = 'POST', $url, $json = false) {
+        $curl = curl_init();
+        $header = [
+            "Content-Type: application/vnd.api+json",
+            "cache-control: no-cache"
+        ];
+     
+            $header[] = "Authorization: Api-Key ". $this->TerminalKey;
+        
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => $method,
+            CURLOPT_POSTFIELDS => $json?json_encode($json):"",
+            CURLOPT_HTTPHEADER => $header,
+        ));
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+        curl_close($curl);
+       
+        if(!empty($this->token)){
+            $this->token = '';
+        }
+        
+        return $response;
+    }
+
+    function transaction($order_id,$amount,$currency,$email, $merchantID, $return_url, $referenceID) {
+        try{
+            
+            $gen_id = rand(5, 99999);
+            $price_show = sprintf('%02.2f', $amount);
+            $params = [
+            'data' => [
+                'attributes' =>
+                [
+                    'projectId' => $merchantID,
+                    'paymentMethod' => 'card',
+                    'currency' => $currency,
+                    'amount' => $price_show, 
+                    //'referenceId'=> $referenceID,
+                    'originalReferenceId' => $referenceID,
+                    'returnUrl'=> $return_url,
+                    'email' => $email,
+                ],
+                'type' => 'refund',
+                ],
+            ];
+            
+            $response_json = $this->request('POST', $this->apiGatewayUrl.'', $params);
+           
+            return $response_json;
+        } catch (\Exception $e) {
+            var_dump($e->getMessage());
+       }
+    }
+}
