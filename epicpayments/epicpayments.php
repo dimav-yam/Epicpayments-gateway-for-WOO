@@ -15,11 +15,10 @@
   License: GPLv2 or later
   License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */
-
+  
 define( 'EPICPAY_DIR', plugin_dir_path( __FILE__ ) );
 define( 'EPICPAY_URL', plugin_dir_url( __FILE__ ) );
 define( 'EPICPAY_VERSION', '1.0' );
-
 $plugin_version = '1.0.7';
 $plugin_release_timestamp = '2023-03-21 16:34';
 $plugin_name        = 'Flexible Refund and Return Order for WooCommerce';
@@ -34,8 +33,6 @@ $dummy_desc       = esc_html__( 'The plugin to handle the refund form on My Acco
 $dummy_plugin_uri = esc_html__( 'https://wpde.sk/flexible-refunds-for-woocommerce', 'flexible-refunds' );
 $dummy_author_uri = esc_html__( 'https://wpdesk.net/', 'flexible-refunds' );
 $dummy_settings   = esc_html__( 'Refund Settings', 'flexible-refunds' );
-
-
 $requirements = [
 	'php'     => '7.3',
 	'wp'      => '5.2',
@@ -46,12 +43,9 @@ $requirements = [
 		],
 	],
 ];
-
-
 require __DIR__ . '/libs/EpicPay.class.php';
 require __DIR__ . '/libs/EpicPay_Refund.class.php';
 require __DIR__ . '/vendor_prefixed/wpdesk/wp-plugin-flow-common/src/plugin-init-php52-free.php';
-
 function epicpay_wc_active() {
 	if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
 		return true;
@@ -59,13 +53,9 @@ function epicpay_wc_active() {
 		return false;
 	}
 }
-
 /****************/
-
 add_action('admin_post_nopriv_get_typeform_data',  'process_data_form_tyepform_webhook', 10);
-
 function process_data_form_tyepform_webhook() {
-
    //$request = file_get_contents('php://input'); // get data from webhoook
 	
 	if($json = json_decode(file_get_contents("php://input"), true)) {
@@ -106,26 +96,19 @@ function process_data_form_tyepform_webhook() {
 		
 		if( $type == "charge.processed" ){
 		if ( $data_result == "success" ){
-
 			global $wpdb,$woocommerce, $post;
 			$get_object = $re;
-
 			$rod = $id_trans_view;
-
 			$order_id_res = $rod;
 			$orderDetail_res = new WC_Order( $order_id_res );
-
 			$orderDetail_res->update_status("wc-processing", 'Processing', TRUE);
 			}
 		}elseif( $type == "charge.failed" ){
 			global $wpdb,$woocommerce, $post;
 			$get_object = $re;
-
 			$rod = $id_trans_view;
-
 			$order_id_res = $rod;
 			$orderDetail_res = new WC_Order( $order_id_res );
-
 			$orderDetail_res->update_status("wc-cancelled", 'Cancelled', TRUE);
 			// The text for the note
 			//$note = __("This is my note's");
@@ -134,9 +117,7 @@ function process_data_form_tyepform_webhook() {
 			
 			}
 		}
-
 }
-
 // define the http_request_host_is_external callback 
 function filter_http_request_host_is_external( $isexternal, $int1, $int2 ) { 
     // make filter magic happen here... 
@@ -145,11 +126,7 @@ function filter_http_request_host_is_external( $isexternal, $int1, $int2 ) {
          
 // add the filter 
 add_filter( 'http_request_host_is_external', 'filter_http_request_host_is_external', 10, 3 );
-
-
 /***************/
-
-
 add_action ('wp_loaded', 'pay_gate');
 		function pay_gate() {
 	
@@ -203,10 +180,8 @@ add_action ('wp_loaded', 'pay_gate');
 			   
 			 }
 		}
-
 add_action( 'plugins_loaded', 'woocommerce_epicpay_init', 0 );
 add_action( 'plugins_loaded', 'woocommerce_epicpay_textdomain' );
-
 function woocommerce_epicpay_init() {
 	if ( ! class_exists( 'WC_Payment_Gateway' ) ) {
 		return;
@@ -217,9 +192,6 @@ function woocommerce_epicpay_init() {
 		$methods[] = 'WC_Gateway_Epicpay';
 		return $methods;
 	}
-
-
-
 	/**
 	 * @property string testmode
 	 * @property string merchantid
@@ -254,6 +226,7 @@ function woocommerce_epicpay_init() {
 			$this->description        = $this->get_option( 'description' );
 			$this->testmode           = $this->get_option( 'testmode' );
 			$this->merchantid         = $this->get_option( 'merchantid' );
+			$this->api_gateway_url    = $this->get_option( 'api_gateway_url' );
 			$this->paymentgatewayid   = $this->get_option( 'paymentgatewayid' );
 			$this->secretkey          = $this->get_option( 'secretkey' );
 			$this->langpaymentpage    = $this->get_option( 'langpaymentpage' );
@@ -284,7 +257,6 @@ function woocommerce_epicpay_init() {
 				<table class="form-table"><?php $this->generate_settings_html(); ?></table>
 			
 				<table class="form-table">		<tbody>
-
 		<tr valign="top">
 			<th scope="row" class="titledesc">
 				<label for="woocommerce_epicpay_title">Return Page URL(base url) </label>
@@ -297,7 +269,6 @@ function woocommerce_epicpay_init() {
 				</fieldset>
 			</td>
 		</tr>
-
 		<tr valign="top">
 			<th scope="row" class="titledesc">
 				<label for="woocommerce_epicpay_title">Notification Url</label>
@@ -312,7 +283,6 @@ function woocommerce_epicpay_init() {
 		</tr>
 				
 		</tbody></table>
-
 			<?php
 		}
 	
@@ -339,7 +309,6 @@ function woocommerce_epicpay_init() {
 					'description' => __( 'This controls the description which the user sees during checkout.', 'epicpay_woocommerce' ),
 					'default'     => __( '', 'epicpay_woocommerce' )
 				),
-
 				/*'notify_URL_API'           => array(
 					'title'       => __( 'Notification Url', 'epicpay_woocommerce' ),
 					'type'        => 'text',
@@ -348,6 +317,12 @@ function woocommerce_epicpay_init() {
 					'style'    => 'background:red',
 					'default'     => get_site_url().'/wp-admin/admin-post.php?action=get_typeform_data'
 				),*/
+				'api_gateway_url'         => array(
+					'title'       => __( 'Api Gateway URL', 'epicpay_woocommerce' ),
+					'type'        => 'text',
+					'description' =>  __( 'This is the url for API Gateway.', 'epicpay_woocommerce' ),
+					'default'     => ''
+				),
 				'merchantid'         => array(
 					'title'       => __( 'Merchant ID', 'epicpay_woocommerce' ),
 					'type'        => 'text',
@@ -360,7 +335,6 @@ function woocommerce_epicpay_init() {
 					'description' => __( 'This is the Secret Key supplied by EpicPayments.', 'epicpay_woocommerce' ),
 					'default'     => ''
 				),
-
 			);
 		}
 		/**
@@ -425,6 +399,7 @@ function woocommerce_epicpay_init() {
 			$ipnUrl = WC()->api_request_url( 'WC_Gateway_Epicpay' );
 			$epicpay_args = array(
 				'merchantid'             => $this->merchantid,
+				'api_gateway_url'    	 => $this->api_gateway_url,
 				'paymentgatewayid'       => $this->paymentgatewayid,
 				'checkhash'              => $this->check_hash( $order ),
 				'orderid'                => 'WC-' . $order->get_id(),
@@ -529,7 +504,6 @@ function woocommerce_epicpay_init() {
 			}
 			return $epicpay_args;
 		}
-
 		//Generate the epicpay button link
 		function generate_epicpay_form( $order_id, $redirect = true ) {
 			global $woocommerce;
@@ -538,11 +512,11 @@ function woocommerce_epicpay_init() {
 			} else {
 				$order = new WC_Order( $order_id );
 			}
-
 			$merchantID = $this->merchantid;/*'98cda84a-24d8-4479-8606-c3a47fe80df1';*/
 			$terminalKey = $this->secretkey; /*'GHDjtBRDO22vgB5X9s6t3iCup2gfw9ahTbC6Sri3sT4SVTtyEbLFNFrbWW4ez2PF';*/
+			$api_gateway_urlID = $this->api_gateway_url; 
 			// environment fetch
-			$epicPay = new EpicPay($merchantID,  $terminalKey);
+			$epicPay = new EpicPay($merchantID,  $terminalKey, $api_gateway_urlID);
 			/*--*/
 			$currency = $order->get_currency(); /*get currency*/
 			$return_url = $this->returnUrl_API;
@@ -846,8 +820,9 @@ function woocommerce_epicpay_init() {
 			}
 			$merchantID = $this->merchantid;/*'98cda84a-24d8-4479-8606-c3a47fe80df1';*/
 			$terminalKey = $this->secretkey; /*'GHDjtBRDO22vgB5X9s6t3iCup2gfw9ahTbC6Sri3sT4SVTtyEbLFNFrbWW4ez2PF';*/
+			$api_gateway_urlID = $this->api_gateway_url;
 			// environment fetch
-			$epicPay_refund = new EpicPay_Refund($merchantID,  $terminalKey);
+			$epicPay_refund = new EpicPay_Refund($merchantID,  $terminalKey, $api_gateway_urlID);
 			/*--*/
 			$currency = 'EUR';
 			$return_url = $this->returnUrl_API;

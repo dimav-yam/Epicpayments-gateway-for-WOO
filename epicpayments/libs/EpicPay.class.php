@@ -1,19 +1,17 @@
 <?php
-
 /*
  * This file is part of the EpicPay package.
  *
  */
-
 class EpicPay {
     private $MerchantLongId;  
     private $token;
     
-    private $apiGatewayUrl = 'https://api.exactly.com/api/v1/transactions';
-    function __construct($MerchantLongId, $TerminalKey) {
+    function __construct($MerchantLongId, $TerminalKey, $api_gateway_urlID) {
        
         $this->MerchantLongId = $MerchantLongId;        
         $this->TerminalKey = $TerminalKey;
+        $this->ApiGatewayUrl  = $api_gateway_urlID;
     }
     private function request($method = 'POST', $url, $json = false) {
         $curl = curl_init();
@@ -45,8 +43,6 @@ class EpicPay {
         
         return $response;
     }
-
-
     function transaction($order_id,$amount,$currency,$email, $merchantID, $return_url, $referenceID) {
         try{
             $gen_id = rand(5, 99999);
@@ -68,7 +64,7 @@ class EpicPay {
                 ],
             ];
             
-            $response_json = $this->request('POST', $this->apiGatewayUrl.'', $params);
+            $response_json = $this->request('POST', $this->ApiGatewayUrl.'', $params);
            
             return $response_json;
         } catch (\Exception $e) {
