@@ -11,7 +11,7 @@ class EpicPay {
        
         $this->MerchantLongId = $MerchantLongId;        
         $this->TerminalKey = $TerminalKey;
-        $this->ApiGatewayUrl  = $api_gateway_urlID;
+        $this->ApiGatewayUrl  = $api_gateway_urlID . 'transactions';
     }
     private function request($method = 'POST', $url, $json = false) {
         $curl = curl_init();
