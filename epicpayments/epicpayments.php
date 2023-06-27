@@ -518,11 +518,11 @@ function woocommerce_epicpay_init() {
 			// environment fetch
 			$epicPay = new EpicPay($merchantID,  $terminalKey, $api_gateway_urlID);
 			/*--*/
-			$currency = $order->get_currency(); /*get currency*/
+			$currency = $order->get_currency(); /*get currency 1--1*/
 			$return_url = $this->returnUrl_API;
 			$amount = $order->get_total(); // amount in euro with point x.xx or not
 			$referenceID = 'charge-'.$order->get_id();
-			$email = 'test@test.com'; 
+			$email = $order->billing_email;
 			/*--*/
 			$result = $epicPay->transaction($order_id,$amount,$currency,$email, $merchantID, $return_url, $referenceID);
 			$obj = json_decode($result);
@@ -583,11 +583,11 @@ function woocommerce_epicpay_init() {
 			// environment fetch
 			$epicPay = new EpicPay($merchantID,  $terminalKey);
 			/*--*/
-			$currency = 'EUR';
+			$currency = $order->get_currency(); /*get currency 1--1*/
 			$return_url = $this->returnUrl_API;
 			$amount = $order->get_total(); // amount in euro with point x.xx or not
 			$referenceID = 'charge-'.$order->get_id();
-			$email = 'test@test.com';
+			$email = $order->billing_email;
 			/*--*/
 			$result = $epicPay->transaction($order_id,$amount,$currency,$email, $merchantID, $return_url, $referenceID);
 			$obj = json_decode($result);
@@ -748,11 +748,11 @@ function woocommerce_epicpay_init() {
 			// environment fetch
 			$epicPay = new EpicPay($merchantID,  $terminalKey);
 			/*--*/
-			$currency = 'EUR';
+			$currency = $order->get_currency(); /*get currency 1--1*/
 			$return_url = $this->returnUrl_API;
 			$amount = $order->get_total(); // amount in euro with point x.xx or not
 			$referenceID = 'charge-'.$order->get_id();
-			$email = 'test@test.com';
+			$email = $order->billing_email;
 			/*--*/
 			$result = $epicPay->transaction($order_id,$amount,$currency,$email, $merchantID, $return_url, $referenceID);
 			$obj = json_decode($result);
@@ -824,11 +824,11 @@ function woocommerce_epicpay_init() {
 			// environment fetch
 			$epicPay_refund = new EpicPay_Refund($merchantID,  $terminalKey, $api_gateway_urlID);
 			/*--*/
-			$currency = 'EUR';
+			$currency = $order->get_currency(); /*get currency 1--1*/
 			$return_url = $this->returnUrl_API;
 			$amount = $order->get_total(); // amount in euro with point x.xx or not
 			$referenceID = 'charge-'.$order->get_id();
-			$email = 'test@test.com';
+			$email = $order->billing_email;
 			/*--*/
 			$result = $epicPay_refund->transaction($order_id,$amount,$currency,$email, $merchantID, $return_url, $referenceID);
 			$obj = json_decode($result);
