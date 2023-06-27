@@ -46,7 +46,6 @@ class EpicPay_Refund {
     function transaction($order_id,$amount,$currency,$email, $merchantID, $return_url, $referenceID) {
         try{
             
-            $gen_id = rand(5, 99999);
             $price_show = sprintf('%02.2f', $amount);
             $params = [
             'data' => [

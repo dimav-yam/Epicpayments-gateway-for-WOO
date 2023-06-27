@@ -110,8 +110,6 @@ function process_data_form_tyepform_webhook() {
 			$order_id_res = $rod;
 			$orderDetail_res = new WC_Order( $order_id_res );
 			$orderDetail_res->update_status("wc-cancelled", 'Cancelled', TRUE);
-			// The text for the note
-			//$note = __("This is my note's");
 			// Add the note
 			$orderDetail_res->add_order_note( "Reason: ".$failed_message );
 			
@@ -309,14 +307,6 @@ function woocommerce_epicpay_init() {
 					'description' => __( 'This controls the description which the user sees during checkout.', 'epicpay_woocommerce' ),
 					'default'     => __( '', 'epicpay_woocommerce' )
 				),
-				/*'notify_URL_API'           => array(
-					'title'       => __( 'Notification Url', 'epicpay_woocommerce' ),
-					'type'        => 'text',
-					'description' => __( 'Please setup this Url in https://dashboard.exactly.com/ for Webhooks as Event / URI', 'epicpay_woocommerce' ),
-					'disabled' => true,
-					'style'    => 'background:red',
-					'default'     => get_site_url().'/wp-admin/admin-post.php?action=get_typeform_data'
-				),*/
 				'api_gateway_url'         => array(
 					'title'       => __( 'Api Gateway URL', 'epicpay_woocommerce' ),
 					'type'        => 'text',
@@ -512,8 +502,8 @@ function woocommerce_epicpay_init() {
 			} else {
 				$order = new WC_Order( $order_id );
 			}
-			$merchantID = $this->merchantid;/*'98cda84a-24d8-4479-8606-c3a47fe80df1';*/
-			$terminalKey = $this->secretkey; /*'GHDjtBRDO22vgB5X9s6t3iCup2gfw9ahTbC6Sri3sT4SVTtyEbLFNFrbWW4ez2PF';*/
+			$merchantID = $this->merchantid;
+			$terminalKey = $this->secretkey; 
 			$api_gateway_urlID = $this->api_gateway_url; 
 			// environment fetch
 			$epicPay = new EpicPay($merchantID,  $terminalKey, $api_gateway_urlID);
@@ -818,8 +808,8 @@ function woocommerce_epicpay_init() {
 			} else {
 				$order = new WC_Order( $order_id );
 			}
-			$merchantID = $this->merchantid;/*'98cda84a-24d8-4479-8606-c3a47fe80df1';*/
-			$terminalKey = $this->secretkey; /*'GHDjtBRDO22vgB5X9s6t3iCup2gfw9ahTbC6Sri3sT4SVTtyEbLFNFrbWW4ez2PF';*/
+			$merchantID = $this->merchantid;
+			$terminalKey = $this->secretkey; 
 			$api_gateway_urlID = $this->api_gateway_url;
 			// environment fetch
 			$epicPay_refund = new EpicPay_Refund($merchantID,  $terminalKey, $api_gateway_urlID);
