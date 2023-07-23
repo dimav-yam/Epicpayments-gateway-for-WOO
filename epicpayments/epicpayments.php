@@ -56,8 +56,7 @@ function epicpay_wc_active() {
 /****************/
 add_action('admin_post_nopriv_get_typeform_data',  'process_data_form_tyepform_webhook', 10);
 function process_data_form_tyepform_webhook() {
-   //$request = file_get_contents('php://input'); // get data from webhoook
-	
+
 	if($json = json_decode(file_get_contents("php://input"), true)) {
   
     $data = $json;
@@ -86,7 +85,6 @@ function process_data_form_tyepform_webhook() {
 	
 	echo "processing:" . $data["included"][0]["attributes"]["processing"]["resultCode"]."\n";
 	$failed_message =  $data["included"][0]["attributes"]["processing"]["resultCode"];
-	//print_r($data);
 	
 	$ref_id_product = $data["included"][0]["attributes"]["referenceId"];
 		
@@ -116,11 +114,7 @@ function process_data_form_tyepform_webhook() {
 			}
 		}
 }
-// define the http_request_host_is_external callback 
-function filter_http_request_host_is_external( $isexternal, $int1, $int2 ) { 
-    // make filter magic happen here... 
-    return true; 
-}; 
+
          
 // add the filter 
 add_filter( 'http_request_host_is_external', 'filter_http_request_host_is_external', 10, 3 );
@@ -137,8 +131,6 @@ add_action ('wp_loaded', 'pay_gate');
 				$order_id = $ord_ID;
 				$orderDetail = new WC_Order( $order_id );
 			   
-				//$orderDetail->update_status("wc-processing", 'Processing', TRUE);
-				//
 			    $checkout_url = wc_get_page_permalink( 'checkout' );
 			    $test_order_key = $orderDetail->get_order_key();
 			    $chk_url = get_site_url().'/checkout/order-received/'.$order_id.'/?key='.$test_order_key;
@@ -202,8 +194,6 @@ function woocommerce_epicpay_init() {
 	 * @property string notification_email
 	 */
 	class WC_Gateway_Epicpay extends WC_Payment_Gateway {
-		//const EPICPAY_ENDPOINT_SANDBOX = '';
-		//const EPICPAY_ENDPOINT_LIVE = '';
 		public function __construct() {
 			$this->id                 = 'epicpay';
 			$this->icon               = EPICPAY_URL . '/cards.png';
@@ -235,8 +225,7 @@ function woocommerce_epicpay_init() {
 			$this->errorurl           = $this->get_option( 'errorurl' );
 			$this->notification_email = $this->get_option( 'notification_email' );
 			$this->TotalLineItem      = 'yes' === $this->get_option( 'TotalLineItem', 'no' );
-			// Filters
-			add_filter( 'wcml_gateway_text_keys_to_translate', array( $this, 'epicpay_text_keys_to_translate' ) );
+
 			// Hooks
 			add_action( 'woocommerce_receipt_' . $this->id, array( $this, 'receipt_page' ) );
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
@@ -404,7 +393,6 @@ function woocommerce_epicpay_init() {
 				'returnurlerror'         => $order->get_checkout_payment_url( true ),
 				'amount'                 => number_format( $order->get_total(), wc_get_price_decimals(), '.', '' ),
 				'pagetype'               => '0',
-				//If set as 1 then cardholder is required to insert email,mobile number,address.
 				'skipreceiptpage'        => '1',
 				'merchantemail'          => $this->notification_email,
 			);
@@ -430,9 +418,7 @@ function woocommerce_epicpay_init() {
 					foreach ( $order->get_items( array( 'line_item', 'fee' ) ) as $item ) {
 						if ( 'fee' === $item['type'] ) {
 							$fee = $item->get_total();
-							if ( $include_tax && $this->fee_tax_display($item) ){
-								$fee += $item->get_total_tax();
-							}
+
 							$fee_total = $this->round( $fee, $order );
 							$item_name = strip_tags( $item->get_name() );
 							$epicpay_args[ 'itemdescription_' . $item_loop ] = html_entity_decode( $item_name, ENT_NOQUOTES, 'UTF-8' );
@@ -516,7 +502,6 @@ function woocommerce_epicpay_init() {
 			/*--*/
 			$result = $epicPay->transaction($order_id,$amount,$currency,$email, $merchantID, $return_url, $referenceID);
 			$obj = json_decode($result);
-			//var_dump($obj);
 				$res = $obj->included;
 				$attr = '';
 				$attr_url = '';
@@ -527,13 +512,10 @@ function woocommerce_epicpay_init() {
 				    $attr_url = $attr->url;
 				}
 			if(!empty($this->errorurl)){
-				//wp_safe_redirect( $this->errorurl );
 				header('Location: '.$attr_url );
-				//wp_safe_redirect( $attr_url );
 			
 			}else{
 				header('Location: '.$attr_url );
-				//wp_safe_redirect( $attr_url );
 			}
 			$cancel_btn_html = ( current_user_can( 'cancel_order', $order_id ) ) ? '<a class="button cancel" href="' . htmlspecialchars_decode($order->get_cancel_order_url()) . '">' . __( 'Cancel order &amp; restore cart', 'epicpay_woocommerce' ) . '</a>' : '';
 			$html_form = '<form action="' . esc_url( $epicpay_adr ) . '" method="post" id="epicpay_payment_form">'
@@ -592,13 +574,10 @@ function woocommerce_epicpay_init() {
 				    $attr_url = $attr->url;
 				}
 			if(!empty($this->errorurl)){
-				//wp_safe_redirect( $this->errorurl );
 				header('Location: '.$attr_url );
-				//wp_safe_redirect( $attr_url );
 			
 			}else{
 				header('Location: '.$attr_url );
-				//wp_safe_redirect( $attr_url );
 			}
 		}
 		function receipt_page( $order_id ) {
@@ -609,8 +588,6 @@ function woocommerce_epicpay_init() {
 					echo $this->generate_epicpay_form( $order_id, false);
 				}
 			}else{
-				$receipttext = $this->get_translated_string($this->receipttext, 'receipttext');
-				if( !empty($receipttext) ) printf('<p>%s</p>', $receipttext );
 				echo $this->generate_epicpay_form( $order_id);
 			}
 		}
@@ -622,22 +599,10 @@ function woocommerce_epicpay_init() {
 		 */
 		protected function round( $price, $order ) {
 			$precision = 2;
-			if ( ! $this->currency_has_decimals( $order->get_currency() ) ) {
-				$precision = 0;
-			}
+			
 			return round( $price, $precision );
 		}
-		/**
-		 * Check if currency has decimals.
-		 * @param  string $currency
-		 * @return bool
-		 */
-		protected function currency_has_decimals( $currency ) {
-			if ( in_array( $currency, array( 'HUF', 'JPY', 'TWD', 'ISK' ) ) ) {
-				return false;
-			}
-			return true;
-		}
+
 		/**
 		 * Check tax display.
 		 * @return bool
@@ -646,55 +611,8 @@ function woocommerce_epicpay_init() {
 			$prices_include_tax = wc_tax_enabled() ? get_option( 'woocommerce_prices_include_tax' ) : 'yes';
 			return ( $prices_include_tax === 'yes' ) ? true : false ;
 		}
-		/**
-		 * Check fee tax display.
-		 * @param  WC_Order_Item_Fee $item
-		 * @return bool
-		 */
-		protected function fee_tax_display( $item ) {
-			$tax_display = $item->get_tax_status();
-			return ( $tax_display == 'taxable' ) ? true : false ;
-		}
-		/**
-		 * Adds text keys to_translate.
-		 * @param  $text_keys array
-		 * @return array
-		 */
-		public function epicpay_text_keys_to_translate( $text_keys ){
-			if( !in_array( 'receipttext', $text_keys ) )
-				$text_keys[] = 'receipttext';
-			if( !in_array( 'redirecttext', $text_keys ) )
-				$text_keys[] = 'redirecttext';
-			return $text_keys;
-		}
-		/**
-		 * Getting translated value
-		 * @param  $string string Original field value
-		 * @param  $name string Field key
-		 * @return string
-		 */
-		public function get_translated_string( $string, $name ) {
-			$translated_string = $string;
-			$current_lang = apply_filters( 'wpml_current_language', NULL );
-			if($current_lang && class_exists('WCML_WC_Gateways') ){
-				if(defined('WCML_WC_Gateways::STRINGS_CONTEXT')){
-					$domain = WCML_WC_Gateways::STRINGS_CONTEXT;
-				} else {
-					$domain = 'woocommerce';
-				}
-				$translated_string = apply_filters(
-					'wpml_translate_single_string',
-					$string,
-					$domain,
-					$this->id . '_gateway_' . $name,
-					$current_lang
-				);
-			}
-			if ( $translated_string === $string ) {
-				$translated_string = __( $string, 'epicpay_woocommerce' );
-			}
-			return $translated_string;
-		}
+
+	
 		/**
 		 * Get cancel order url
 		 */
@@ -757,13 +675,10 @@ function woocommerce_epicpay_init() {
 				    $attr_url = $attr->url;
 				}
 			if(!empty($this->errorurl)){
-				//wp_safe_redirect( $this->errorurl );
 				header('Location: '.$attr_url );
-				//wp_safe_redirect( $attr_url );
 			
 			}else{
 				header('Location: '.$attr_url );
-				//wp_safe_redirect( $attr_url );
 			}
 		}
 		function cancel_response_process($order, $message = ''){
@@ -827,7 +742,6 @@ function woocommerce_epicpay_init() {
 					$message2 = sprintf( __('EpicPayments error: %s, Amount: %s %s', 'epicpay_woocommerce' ), $result['message2'], $amount, $order->get_currency() );
 					$order->add_order_note( $message );
 					return true;
-					//return new WP_Error( 'error', $result['message2'] );
 				}
 			return false;
 		}
