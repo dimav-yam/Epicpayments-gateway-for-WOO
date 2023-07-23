@@ -55,7 +55,6 @@ class EpicPay_Refund {
                     'paymentMethod' => 'card',
                     'currency' => $currency,
                     'amount' => $price_show, 
-                    //'referenceId'=> $referenceID,
                     'originalReferenceId' => $referenceID,
                     'returnUrl'=> $return_url,
                     'email' => $email,
